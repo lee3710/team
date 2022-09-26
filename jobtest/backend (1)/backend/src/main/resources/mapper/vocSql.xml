@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.team.backend">
+
+    <insert id="insertVoc" parameterType="com.team.backend.model.VocDTO">
+        insert into voc
+        values (
+            voc_idx.nextval,
+            #{admin_idx},
+            #{voc_attribution},
+            #{voc_cont},
+            sysdate
+        )
+    </insert>
+
+    <select id="selectVoc"  resultType="com.team.backend.model.VocListVO">
+        select b.voc_attribution, b.voc_cont, penalty.penalty_cont,
+        courier_check_yn, courier_obj_yn, b.reparation_cash, b.reparation_state
+        from (
+        select a.voc_attribution, a.voc_cont, reparation_idx,
+        reparation_cash, reparation_state
+        from
+        (select  voc_attribution, voc_cont, voc_idx
+        from voc) a, reparation
+        where a.voc_idx=reparation.voc_idx)b, penalty
+        where b.reparation_idx=penalty.reparation_idx
+    </select>
+
+    <insert id="insertReparation" parameterType="com.team.backend.model.ReparationDTO">
+        insert into reparation
+        values(
+            reparation_idx.nextval,
+            #{voc_idx},
+            #{reparation_cash},
+            #{reparation_state}
+        )
+    </insert>
+
+    <select id="selectReparation" resultType="com.team.backend.model.ReparationDTO">
+        select * from reparation
+    </select>
+
+    <insert id="insertPenalty" parameterType="com.team.backend.model.PenaltyDTO">
+        insert into penalty
+        values(
+            penalty_idx.nextval,
+            #{reparation_idx},
+            #{penalty_cont},
+            #{courier_idx},
+            #{courier_check_yn},
+            #{courier_aprvl_yn},
+            #{courier_obj_yn}
+        )
+    </insert>
+
+</mapper>
